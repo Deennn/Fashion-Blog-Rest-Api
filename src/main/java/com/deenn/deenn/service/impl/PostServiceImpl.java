@@ -5,6 +5,9 @@ import com.deenn.deenn.entity.Post;
 import com.deenn.deenn.exception.ResourceNotFoundException;
 import com.deenn.deenn.repository.PostRepository;
 import com.deenn.deenn.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -39,8 +42,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ResponseEntity<List<PostDto>> getAllPosts() {
-        return ResponseEntity.ok( postRepository.findAll().stream().map(post -> PostDto.builder()
+    public ResponseEntity<List<PostDto>> getAllPosts(int pageNo, int pageSize) {
+
+        Pageable pageable  = PageRequest.of(pageNo, pageSize);
+
+
+        return ResponseEntity.ok(postRepository.findAll(pageable).getContent().stream().map(post -> PostDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .description(post.getDescription())
