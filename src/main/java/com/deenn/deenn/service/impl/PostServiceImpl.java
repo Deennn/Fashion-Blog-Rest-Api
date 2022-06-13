@@ -1,13 +1,14 @@
 package com.deenn.deenn.service.impl;
 
 import com.deenn.deenn.dto.PostDto;
+import com.deenn.deenn.dto.PostResponse;
 import com.deenn.deenn.entity.Post;
 import com.deenn.deenn.exception.ResourceNotFoundException;
 import com.deenn.deenn.repository.PostRepository;
 import com.deenn.deenn.service.PostService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -42,17 +43,28 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ResponseEntity<List<PostDto>> getAllPosts(int pageNo, int pageSize) {
+    public ResponseEntity<PostResponse> getAllPosts(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() :
+                Sort.by(sortBy).descending();
+        Pageable pageable  = PageRequest.of(pageNo, pageSize, sort);
+        var posts = postRepository.findAll(pageable);
 
-        Pageable pageable  = PageRequest.of(pageNo, pageSize);
-
-
-        return ResponseEntity.ok(postRepository.findAll(pageable).getContent().stream().map(post -> PostDto.builder()
+        List<PostDto> postDtoList = posts.getContent().stream().map(post -> PostDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .description(post.getDescription())
                 .content(post.getContent())
-                .build()).collect(Collectors.toList()));
+                .build()).collect(Collectors.toList());
+
+
+        return ResponseEntity.ok(PostResponse.builder()
+                .content(postDtoList)
+                .pageNo(posts.getNumber())
+                .pageSize(posts.getSize())
+                .totalElements(posts.getNumberOfElements())
+                .totalPages(posts.getTotalPages())
+                .last(posts.isLast())
+                .build());
     }
 
     @Override
@@ -84,8 +96,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ResponseEntity<String> deletePost(long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("post", "postId", postId));
-        postRepository.delete(post);
+        postRepository.deleteById(postId);
         return ResponseEntity.ok("Post deleted successfully");
     }
 }
