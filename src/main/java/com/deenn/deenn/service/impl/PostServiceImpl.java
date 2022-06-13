@@ -96,8 +96,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ResponseEntity<String> deletePost(long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("post", "postId", postId));
-        postRepository.delete(post);
+        postRepository.deleteById(postId);
         return ResponseEntity.ok("Post deleted successfully");
     }
 }
