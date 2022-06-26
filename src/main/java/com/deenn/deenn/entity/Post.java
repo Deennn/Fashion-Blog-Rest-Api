@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.HashSet;
 
 @Data @Builder
 @AllArgsConstructor @NoArgsConstructor
@@ -37,4 +39,7 @@ public class Post {
 
     @UpdateTimestamp
     private Instant modifiedAt;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private Collection<Comment> comments = new HashSet<>();
 }
