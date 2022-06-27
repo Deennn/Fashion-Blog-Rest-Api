@@ -1,5 +1,6 @@
 package com.deenn.deenn.service.impl;
 
+import com.deenn.deenn.dto.CommentDto;
 import com.deenn.deenn.dto.PostDto;
 import com.deenn.deenn.dto.PostResponse;
 import com.deenn.deenn.entity.Post;
@@ -54,6 +55,8 @@ public class PostServiceImpl implements PostService {
                 .title(post.getTitle())
                 .description(post.getDescription())
                 .content(post.getContent())
+                .comments(post.getComments().stream().map( comment -> CommentDto.builder().name(comment.getName())
+                        .email(comment.getEmail()).body(comment.getBody()).build()).collect(Collectors.toList()))
                 .build()).collect(Collectors.toList());
 
 
@@ -74,6 +77,8 @@ public class PostServiceImpl implements PostService {
                .title(post.getTitle())
                .description(post.getDescription())
                .content(post.getContent())
+               .comments(post.getComments().stream().map( comment -> CommentDto.builder().name(comment.getName())
+                       .email(comment.getEmail()).body(comment.getBody()).build()).collect(Collectors.toList()))
                .build()).orElseThrow( () -> new ResourceNotFoundException("post", "postId", postId)));
     }
 
@@ -90,6 +95,7 @@ public class PostServiceImpl implements PostService {
                       .title(newPost.getTitle())
                       .description(newPost.getDescription())
                       .content(newPost.getContent())
+
                       .build());
 
     }

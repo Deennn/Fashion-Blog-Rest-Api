@@ -8,6 +8,7 @@ import com.deenn.deenn.exception.ResourceNotFoundException;
 import com.deenn.deenn.repository.CommentRepository;
 import com.deenn.deenn.repository.PostRepository;
 import com.deenn.deenn.service.CommentService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,12 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
-    public CommentServiceImpl(PostRepository postRepository, CommentRepository commentRepository) {
+    private final ModelMapper mapper;
+
+    public CommentServiceImpl(PostRepository postRepository, CommentRepository commentRepository, ModelMapper mapper) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
+        this.mapper = mapper;
     }
 
     @Override

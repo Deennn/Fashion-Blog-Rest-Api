@@ -1,7 +1,9 @@
 package com.deenn.deenn.service.impl;
 
+import com.deenn.deenn.dto.CommentDto;
 import com.deenn.deenn.dto.PostDto;
 import com.deenn.deenn.dto.PostResponse;
+import com.deenn.deenn.entity.Comment;
 import com.deenn.deenn.entity.Post;
 import com.deenn.deenn.exception.ResourceNotFoundException;
 import com.deenn.deenn.repository.PostRepository;
@@ -18,9 +20,8 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,15 +55,18 @@ class PostServiceImplTest {
     @BeforeEach
     void setUp() {
         postDto = PostDto.builder()
+                .id(1L)
                 .title("first")
                 .description("first description")
                 .content("first content")
                 .build();
 
         post = Post.builder()
+                .id(1L)
                 .title(postDto.getTitle())
                 .description(postDto.getDescription())
                 .content(postDto.getContent())
+//                .comments(post.getComments())
                 .build();
 
     }
@@ -70,14 +74,14 @@ class PostServiceImplTest {
     @Test
     void createPost() {
 
-        given(postRepository.save(post)).willReturn(post);
+        given(postRepository.save(any())).willReturn(post);
 
         var savedPost = postService.createPost(postDto);
 
         Assertions.assertThat(savedPost).isNotNull();
         assertEquals(Objects.requireNonNull(savedPost.getBody()).getTitle(), post.getTitle());
         assertEquals(savedPost.getStatusCode(), HttpStatus.CREATED);
-        verify(postRepository, atLeastOnce()).save(post);
+        verify(postRepository, times(1)).save(any());
     }
 
     @Test
@@ -100,7 +104,34 @@ class PostServiceImplTest {
 
     @Test
     void getPostById() {
-        given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+        Comment comment =  Comment.builder()
+                .name("deenn")
+                .email("a@gmail.com")
+                .body("cool stuff")
+                .build();
+
+        Set<Comment> tired = new HashSet<>();
+        tired.add(comment);
+
+        post = Post.builder()
+                .id(1L)
+                .title(postDto.getTitle())
+                .description(postDto.getDescription())
+                .content(postDto.getContent())
+                .comments(tired)
+                .build();
+
+        postDto = PostDto.builder()
+                .id(1L)
+                .title("first")
+                .description("first description")
+                .content("first content")
+                .comments(post.getComments().stream().map( comments -> CommentDto.builder().name(comments.getName())
+                        .email(comments.getEmail()).body(comments.getBody()).build()).collect(Collectors.toList()))
+//                .comments(comment)
+                .build();
+
+        given(postRepository.findById(1L)).willReturn(Optional.of(post));
 
         ResponseEntity<PostDto> postDtoResponseEntity = postService.getPostById(1L);
 
