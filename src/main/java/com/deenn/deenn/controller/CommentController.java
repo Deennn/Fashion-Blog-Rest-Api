@@ -5,6 +5,7 @@ import com.deenn.deenn.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,7 +19,7 @@ public class CommentController {
     }
 
     @PostMapping("posts/{postId}/comments")
-    public ResponseEntity<CommentDto> makeComment(@RequestBody CommentDto commentDto, @PathVariable long postId) {
+    public ResponseEntity<CommentDto> makeComment(@Valid @RequestBody CommentDto commentDto, @PathVariable long postId) {
         return commentService.createComment(postId, commentDto);
     }
 
@@ -33,7 +34,7 @@ public class CommentController {
     }
 
     @PutMapping("posts/{postId}/comments/{commentId}")
-    public ResponseEntity<CommentDto> updateComment(@PathVariable long postId, @PathVariable long commentId, @RequestBody CommentDto commentDto) {
+    public ResponseEntity<CommentDto> updateComment(@Valid @PathVariable long postId, @PathVariable long commentId, @RequestBody CommentDto commentDto) {
         return commentService.updateComment(postId, commentId, commentDto);
     }
     @DeleteMapping("posts/{postId}/comments/{commentId}")
