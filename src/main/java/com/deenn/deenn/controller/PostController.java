@@ -7,6 +7,8 @@ import com.deenn.deenn.utils.AppConstants;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
@@ -18,7 +20,7 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
+    public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto) {
         return postService.createPost(postDto);
     }
 
@@ -37,7 +39,7 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<PostDto> updatePost(@PathVariable long postId, @RequestBody PostDto postDto) {
+    public ResponseEntity<PostDto> updatePost( @Valid @PathVariable long postId, @RequestBody PostDto postDto) {
         return postService.updatePost(postId, postDto);
     }
 
